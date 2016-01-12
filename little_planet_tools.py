@@ -7,7 +7,7 @@ import numpy as np
 def fun_create_little_planet(pano_equirectangular_name, config_file_pto, litte_planet_name):
     '''The function create a little planet.
     
-    IN:
+    In:
         - pano_equirectangular_name (str): path and name of the image to process
         - config_file_pto (str): name of the config file for Hugin 
         - litte_planet_name
