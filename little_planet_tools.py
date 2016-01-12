@@ -33,14 +33,14 @@ def fun_transform_pano2littleplanet(pano_equirectangular_name, config_file_name 
         # we copy the image where the function is called
         destination_head_path == os.getcwd()+"/"
 
-    print destination_head_path
+    #print destination_head_path
 
     # apply command
     if config_file_name[-4:] != ".pto":
         config_file_name = config_file_name+".pto"
     
     command_line_for_Hugin = "/Applications/HuginTools/nona -o imLittlePanet33 -m TIFF %s %s" % (config_file_name, pano_equirectangular_name)    
-    print command_line_for_Hugin
+    #print command_line_for_Hugin
     os.system(command_line_for_Hugin)
 
     # convert the create TIF image into jpg
@@ -111,6 +111,7 @@ def fun_save_all_images(pano_little_planet_name, destination_path, img, img_gray
     Eventually it also create a montage of the square image versions."""
     print "image name is %s" % pano_little_planet_name
     ss = np.shape(img)
+    print destination_path
     cv2.imwrite(destination_path+"/"+"lp_r0_"+pano_little_planet_name, img)
     cv2.imwrite(destination_path+"/"+"lp_s0_"+pano_little_planet_name, img[:,np.round(ss[0] / 2):np.round(ss[0] / 2)+ss[0],:])
 
@@ -130,15 +131,17 @@ def fun_save_all_images(pano_little_planet_name, destination_path, img, img_gray
     cv2.imwrite(destination_path+"/"+"lp_s3_"+pano_little_planet_name, 
                                                         np.float32(img_bin_inverse[:,np.round(ss[0] / 2):np.round(ss[0] / 2)+ss[0]]))
 
+    del img, img_gray, img_bin_gray_binary, img_bin_inverse
+
     # create the mosaic of rectangle images
-    command_montage = "montage -tile 1x4 "+destination_path+"/lp_r0_"+pano_little_planet_name+" "+destination_path+"/lp_r1_"+pano_little_planet_name+" "+destination_path+"/lp_r2_"+pano_little_planet_name+" "+destination_path+"/lp_r3_"+pano_little_planet_name+" -background white -border 5 -bordercolor fuchsia -geometry +5+5 le_labo_photo/imMontage4Rect_Ver_"+pano_little_planet_name 
+    command_montage = "montage -tile 1x4 "+destination_path+"/lp_r0_"+pano_little_planet_name+" "+destination_path+"/lp_r1_"+pano_little_planet_name+" "+destination_path+"/lp_r2_"+pano_little_planet_name+" "+destination_path+"/lp_r3_"+pano_little_planet_name+" -background white -border 5 -bordercolor fuchsia -geometry +5+5 "+destination_path+"/imMontage4Rect_Ver_"+pano_little_planet_name 
     os.system(command_montage)
 
     # create the mosaic of square images
-    command_montage = "montage -tile 2x2 "+destination_path+"/lp_s0_"+pano_little_planet_name+" "+destination_path+"/lp_s1_"+pano_little_planet_name+" "+destination_path+"/lp_s2_"+pano_little_planet_name+" "+destination_path+"/lp_s3_"+pano_little_planet_name+" -background white -border 5 -bordercolor fuchsia -geometry +5+5 le_labo_photo/imMontage4Squares_"+pano_little_planet_name 
+    command_montage = "montage -tile 2x2 "+destination_path+"/lp_s0_"+pano_little_planet_name+" "+destination_path+"/lp_s1_"+pano_little_planet_name+" "+destination_path+"/lp_s2_"+pano_little_planet_name+" "+destination_path+"/lp_s3_"+pano_little_planet_name+" -background white -border 5 -bordercolor fuchsia -geometry +5+5 "+destination_path+"/imMontage4Squares_"+pano_little_planet_name 
     os.system(command_montage)
 
-    command_montage = "montage -tile 1x4 "+destination_path+"/lp_s0_"+pano_little_planet_name+" "+destination_path+"/lp_s1_"+pano_little_planet_name+" "+destination_path+"/lp_s2_"+pano_little_planet_name+" "+destination_path+"/lp_s3_"+pano_little_planet_name+" -background white -border 5 -bordercolor fuchsia -geometry +5+5 le_labo_photo/imMontage4Squares_Ver_"+pano_little_planet_name 
+    command_montage = "montage -tile 1x4 "+destination_path+"/lp_s0_"+pano_little_planet_name+" "+destination_path+"/lp_s1_"+pano_little_planet_name+" "+destination_path+"/lp_s2_"+pano_little_planet_name+" "+destination_path+"/lp_s3_"+pano_little_planet_name+" -background white -border 5 -bordercolor fuchsia -geometry +5+5 "+destination_path+"/imMontage4Squares_Ver_"+pano_little_planet_name 
     os.system(command_montage)
 
 
