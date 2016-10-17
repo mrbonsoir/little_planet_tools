@@ -22,32 +22,36 @@ def fun_transform_pano2littleplanet(pano_equirectangular_name, config_file_name 
     It return the image as an numpy array as usual and save the little planet image as jpg file.
     """
 
+    #print pano_equirectangular_name
+
     # get image path
     head_path, tail_path = os.path.split(pano_equirectangular_name)
 
     # get the destination image path
     if destination_head_path != "/":
-        # new path
-        destination_head_path = os.getcwd()+destination_head_path
+        # new path MEANING one already created that can located anywhere
+        destination_head_path = destination_head_path
+        if destination_head_path[-1] != "/":
+            destination_head_path = destination_head_path+"/"
     else:
         # we copy the image where the function is called
         destination_head_path == os.getcwd()+"/"
 
-    #print destination_head_path
+    #print "Destination path : %s" % destination_head_path
 
     # apply command
     if config_file_name[-4:] != ".pto":
         config_file_name = config_file_name+".pto"
     
-    command_line_for_Hugin = "/Applications/HuginTools/nona -o imLittlePanet33 -m TIFF %s %s" % (config_file_name, pano_equirectangular_name)    
+    command_line_for_Hugin = "/Applications/Hugin/HuginTools/nona -o imLittlePlanet33 -m TIFF %s %s" % (config_file_name, pano_equirectangular_name)
     #print command_line_for_Hugin
     os.system(command_line_for_Hugin)
 
     # convert the create TIF image into jpg
-    im_little_planet_tiff = cv2.imread(os.getcwd()+"/imLittlePanet33.tif")
+    im_little_planet_tiff = cv2.imread(os.getcwd()+"/imLittlePlanet33.tif")
     cv2.imwrite(destination_head_path+"/"+pano_little_planet_name, im_little_planet_tiff)
 
-def fun_create_config_for_littleplanet(pano_equirectangular_name, output_file_name = "template33", 
+def fun_create_config_for_littleplanet(pano_equirectangular_name, output_file_name = "template33",
                                        output_width = 3000, output_height = 1500, 
                                        r_angle = 0, p_angle = 90, y_angle = 0,  
                                        output_distance = 300):
@@ -77,7 +81,7 @@ def fun_create_config_for_littleplanet(pano_equirectangular_name, output_file_na
         - r_angle =  90, p_angle =   X, y_angle = -90 for a rotation clockwise of an inverse little planet.
     """
 
-    # get the suze parameters from the pano equirectangular
+    # get the size parameters from the pano equirectangular
 
     imPanoEqui   = Image.open(pano_equirectangular_name)
     image_width  = imPanoEqui.size[0]
@@ -107,8 +111,10 @@ def fun_create_config_for_littleplanet(pano_equirectangular_name, output_file_na
     f.close()
 
 def fun_save_all_images(pano_little_planet_name, destination_path, img, img_gray, img_bin_gray_binary, img_bin_inverse):
-    """The function saves all images in rectangle and square format.
-    Eventually it also create a montage of the square image versions."""
+    """
+    The function saves all images in rectangle and square format.
+    Eventually it also create a montage of the square image versions.
+    """
     print "image name is %s" % pano_little_planet_name
     ss = np.shape(img)
     print destination_path
@@ -145,3 +151,117 @@ def fun_save_all_images(pano_little_planet_name, destination_path, img, img_gray
     os.system(command_montage)
 
 
+def fun_create_frame_for_lp_animation(im_pano_equirectangular_name,
+                                      destination_head_path,
+                                      var_p_angle=90,
+                                      val_angle=45,
+                                      var_output_width=1024,
+                                      var_output_height=512,
+                                      var_output_distance=330):
+    """
+    The function creates several images/frame with only the rotation angle value
+    changing, such that we can have the illusion the planet is turning around.
+
+    It generates a new configuration file for each frame.
+
+    IN:
+        im_pano_equirectangular_name (str):  the name of the equirectangular
+        destination_head_path (str): the path where to store the little_planet
+        val_angle (int): 45 if 45 then angle value are 0 / 45 / 90 / ...
+        output_width (int): 1024
+        output_height (int): 512
+        output_distance (int): 330
+    OUT:
+
+
+    """
+    print "img name: %s " % im_pano_equirectangular_name
+    print "img dest: %s" % destination_head_path
+    print "angle start: %1.0f" % var_p_angle
+    print "angle step %1.0f" % val_angle
+    print "output width %1.0f" % var_output_width
+    print "output height %1.0f" % var_output_height
+    print "output distance %1.0f" % var_output_distance
+
+    c = 0
+    for angle_value in np.arange(0, 360, val_angle):
+        little_planet_name = 'frame_' + str(c).zfill(3)
+        print angle_value,  # little_planet_name
+
+        # config file
+        fun_create_config_for_littleplanet(im_pano_equirectangular_name,
+                                               output_file_name="config33_animation",
+                                               output_width=var_output_width,
+                                               output_height=var_output_height,
+                                               r_angle=-90, p_angle=var_p_angle + angle_value, y_angle=-90,
+                                               output_distance=var_output_distance)
+
+        # apply config file
+        fun_transform_pano2littleplanet(im_pano_equirectangular_name,
+                                        config_file_name="config33_animation",
+                                        pano_little_planet_name=little_planet_name + ".jpg",
+                                        destination_head_path=destination_head_path)
+        c += 1
+    print "\nNow we are done. Good job you did."
+
+
+
+def fun_create_frame_for_lp_animation_with_spiral(im_pano_equirectangular_name,
+                                      destination_head_path,
+                                      var_p_angle=90,
+                                      val_angle=45,
+                                      var_output_width=1024,
+                                      var_output_height=512,
+                                      var_output_distance= np.array([360, 330]),
+                                      start_index_frame = 0):
+    """
+    The function does like the one above but this time with a parameter for the distance as well.
+
+    It generates a new configuration file for each frame.
+
+    IN:
+        im_pano_equirectangular_name (str):  the name of the equirectangular
+        destination_head_path (str): the path where to store the little_planet
+        val_angle (int): 45 if 45 then angle value are 0 / 45 / 90 / ...
+        output_width (int): 1024
+        output_height (int): 512
+        output_distance (int): [360,330] for each angle will be a corresponding distance from 360 to
+                                the output_distance or the other way around
+    OUT:
+        frame are save in the destination head path.
+
+    """
+    print "img name: %s " % im_pano_equirectangular_name
+    print "dest img: %s" % destination_head_path
+    print "angle start: %1.0f" % var_p_angle
+    print "angle step %1.0f" % val_angle
+    print "output width %1.0f" % var_output_width
+    print "output height %1.0f" % var_output_height
+    print "output distance %1.0f -> %1.0f" % (var_output_distance[0], var_output_distance[1])
+
+    c = start_index_frame
+
+    vec_angle_value = np.arange(0, 360, val_angle)
+    vec_distance_value = np.linspace(var_output_distance[0], var_output_distance[1], len(vec_angle_value))
+
+    for angle_value, distance_value in zip(vec_angle_value, vec_distance_value):
+        little_planet_name = 'frame_' + str(c).zfill(3)
+        #print "angle %1.0f distance %1.0f" % (angle_value,  distance_value)
+
+        # config file
+        fun_create_config_for_littleplanet(im_pano_equirectangular_name,
+                                               output_file_name="config33_animation",
+                                               output_width=var_output_width,
+                                               output_height=var_output_height,
+                                               r_angle=-90, p_angle=var_p_angle + angle_value, y_angle=-90,
+                                               output_distance=distance_value)
+
+        # apply config file
+        fun_transform_pano2littleplanet(im_pano_equirectangular_name,
+                                        config_file_name="config33_animation",
+                                        pano_little_planet_name=little_planet_name + ".jpg",
+                                        destination_head_path=destination_head_path)
+        c += 1
+        
+    print "angle %1.0f distance %1.0f" % (angle_value, distance_value)
+    print "\nNow we are done. Good job you did."
