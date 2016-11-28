@@ -12,6 +12,11 @@
 *.pyc
 *.ipynb
 __init__*
+to_do.txt
+
+# hugin config file #
+#####################
+*.pto
 
 # Packages #
 ############

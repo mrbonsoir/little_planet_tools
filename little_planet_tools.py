@@ -6,10 +6,10 @@ import numpy as np
 
 def fun_create_little_planet(pano_equirectangular_name, config_file_pto, litte_planet_name):
     '''The function create a little planet.
-    
+
     In:
         - pano_equirectangular_name (str): path and name of the image to process
-        - config_file_pto (str): name of the config file for Hugin 
+        - config_file_pto (str): name of the config file for Hugin
         - litte_planet_name
     '''
 
@@ -42,7 +42,7 @@ def fun_transform_pano2littleplanet(pano_equirectangular_name, config_file_name 
     # apply command
     if config_file_name[-4:] != ".pto":
         config_file_name = config_file_name+".pto"
-    
+
     command_line_for_Hugin = "/Applications/Hugin/HuginTools/nona -o imLittlePlanet33 -m TIFF %s %s" % (config_file_name, pano_equirectangular_name)
     #print command_line_for_Hugin
     os.system(command_line_for_Hugin)
@@ -52,8 +52,8 @@ def fun_transform_pano2littleplanet(pano_equirectangular_name, config_file_name 
     cv2.imwrite(destination_head_path+"/"+pano_little_planet_name, im_little_planet_tiff)
 
 def fun_create_config_for_littleplanet(pano_equirectangular_name, output_file_name = "template33",
-                                       output_width = 3000, output_height = 1500, 
-                                       r_angle = 0, p_angle = 90, y_angle = 0,  
+                                       output_width = 3000, output_height = 1500,
+                                       r_angle = 0, p_angle = 90, y_angle = 0,
                                        output_distance = 300):
     """This function create a pto file for hugin that can be used with nona.
 
@@ -64,16 +64,16 @@ def fun_create_config_for_littleplanet(pano_equirectangular_name, output_file_na
 
     input:
         pano_equirectangular_name (char) : name of the panorama image you want to create little planet from.
-        output_fileName (char) : "template33" | name of the pto filem can be changed 
+        output_fileName (char) : "template33" | name of the pto filem can be changed
         image_width   (float) : 3000  | size for the input image (not sure it is necessary)
         image_height  (float) : 1500  |
-        output_width  (float) : 3000  | size for the output little planet image 
+        output_width  (float) : 3000  | size for the output little planet image
         output_height (float) : 1500  |
         r_angle (float) : 0           | angle values to make the initial spherical panorama to rotate before projection on plan
-        p_angle (float) : 90          | 
-        y_angle (float) : 0           |  
+        p_angle (float) : 90          |
+        y_angle (float) : 0           |
         output_distance (float) : 300 | tell how small(360)/big(0) will appear the little planet
-    
+
     About r_angle, p_angle and y_angle, they are key parameters to control the rotationo of the little planet:
         - r_angle =   0, p_angle =  90, y_angle =   0 (default)
         - r_angle =   0, p_angle = -90, y_angle =   0 for an inverse little planet.
@@ -124,32 +124,31 @@ def fun_save_all_images(pano_little_planet_name, destination_path, img, img_gray
     # save gray version of the image
     cv2.imwrite(destination_path+"/"+"lp_r1_"+pano_little_planet_name, img_gray)
     cv2.imwrite(destination_path+"/"+"lp_s1_"+pano_little_planet_name, img_gray[:,np.round(ss[0] / 2):np.round(ss[0] / 2)+ss[0]])
-    
+
     # save the inverse mask image
     img_bin_gray_binary = img_bin_gray_binary.astype(int) * 255
     cv2.imwrite(destination_path+"/"+"lp_r2_"+pano_little_planet_name, np.float32(img_bin_gray_binary))
-    cv2.imwrite(destination_path+"/"+"lp_s2_"+pano_little_planet_name, 
+    cv2.imwrite(destination_path+"/"+"lp_s2_"+pano_little_planet_name,
                                                         np.float32(img_bin_gray_binary[:,np.round(ss[0] / 2):np.round(ss[0] / 2)+ss[0]]))
-    
+
     # save the inverse mask image
     img_bin_inverse = img_bin_inverse.astype(int) * 255
     cv2.imwrite(destination_path+"/"+"lp_r3_"+pano_little_planet_name, np.float32(img_bin_inverse))
-    cv2.imwrite(destination_path+"/"+"lp_s3_"+pano_little_planet_name, 
+    cv2.imwrite(destination_path+"/"+"lp_s3_"+pano_little_planet_name,
                                                         np.float32(img_bin_inverse[:,np.round(ss[0] / 2):np.round(ss[0] / 2)+ss[0]]))
 
     del img, img_gray, img_bin_gray_binary, img_bin_inverse
 
     # create the mosaic of rectangle images
-    command_montage = "montage -tile 1x4 "+destination_path+"/lp_r0_"+pano_little_planet_name+" "+destination_path+"/lp_r1_"+pano_little_planet_name+" "+destination_path+"/lp_r2_"+pano_little_planet_name+" "+destination_path+"/lp_r3_"+pano_little_planet_name+" -background white -border 5 -bordercolor fuchsia -geometry +5+5 "+destination_path+"/imMontage4Rect_Ver_"+pano_little_planet_name 
+    command_montage = "montage -tile 1x4 "+destination_path+"/lp_r0_"+pano_little_planet_name+" "+destination_path+"/lp_r1_"+pano_little_planet_name+" "+destination_path+"/lp_r2_"+pano_little_planet_name+" "+destination_path+"/lp_r3_"+pano_little_planet_name+" -background white -border 5 -bordercolor fuchsia -geometry +5+5 "+destination_path+"/imMontage4Rect_Ver_"+pano_little_planet_name
     os.system(command_montage)
 
     # create the mosaic of square images
-    command_montage = "montage -tile 2x2 "+destination_path+"/lp_s0_"+pano_little_planet_name+" "+destination_path+"/lp_s1_"+pano_little_planet_name+" "+destination_path+"/lp_s2_"+pano_little_planet_name+" "+destination_path+"/lp_s3_"+pano_little_planet_name+" -background white -border 5 -bordercolor fuchsia -geometry +5+5 "+destination_path+"/imMontage4Squares_"+pano_little_planet_name 
+    command_montage = "montage -tile 2x2 "+destination_path+"/lp_s0_"+pano_little_planet_name+" "+destination_path+"/lp_s1_"+pano_little_planet_name+" "+destination_path+"/lp_s2_"+pano_little_planet_name+" "+destination_path+"/lp_s3_"+pano_little_planet_name+" -background white -border 5 -bordercolor fuchsia -geometry +5+5 "+destination_path+"/imMontage4Squares_"+pano_little_planet_name
     os.system(command_montage)
 
-    command_montage = "montage -tile 1x4 "+destination_path+"/lp_s0_"+pano_little_planet_name+" "+destination_path+"/lp_s1_"+pano_little_planet_name+" "+destination_path+"/lp_s2_"+pano_little_planet_name+" "+destination_path+"/lp_s3_"+pano_little_planet_name+" -background white -border 5 -bordercolor fuchsia -geometry +5+5 "+destination_path+"/imMontage4Squares_Ver_"+pano_little_planet_name 
+    command_montage = "montage -tile 1x4 "+destination_path+"/lp_s0_"+pano_little_planet_name+" "+destination_path+"/lp_s1_"+pano_little_planet_name+" "+destination_path+"/lp_s2_"+pano_little_planet_name+" "+destination_path+"/lp_s3_"+pano_little_planet_name+" -background white -border 5 -bordercolor fuchsia -geometry +5+5 "+destination_path+"/imMontage4Squares_Ver_"+pano_little_planet_name
     os.system(command_montage)
-
 
 def fun_create_frame_for_lp_animation(im_pano_equirectangular_name,
                                       destination_head_path,
@@ -203,8 +202,6 @@ def fun_create_frame_for_lp_animation(im_pano_equirectangular_name,
                                         destination_head_path=destination_head_path)
         c += 1
     print "\nNow we are done. Good job you did."
-
-
 
 def fun_create_frame_for_lp_animation_with_spiral(im_pano_equirectangular_name,
                                       destination_head_path,
@@ -262,6 +259,6 @@ def fun_create_frame_for_lp_animation_with_spiral(im_pano_equirectangular_name,
                                         pano_little_planet_name=little_planet_name + ".jpg",
                                         destination_head_path=destination_head_path)
         c += 1
-        
+
     print "angle %1.0f distance %1.0f" % (angle_value, distance_value)
     print "\nNow we are done. Good job you did."
