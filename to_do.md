@@ -13,10 +13,10 @@ Concretely you have a python module called **little_planet_tools** that you can 
 
 Below an attempt to keep track on the modifications I want to add to my code.
 
-To do | in process | done for good
+To do | in process | done for good | module name
 --- |:---:|:---:
-configuration file **pto** to generate a **littple planet** | | x
-better color stripes/circles generation | x  |
+configuration file **pto** to generate a **little planet** | | x | little_planet_tools.py
+better color stripes/circles generation |  | x | background_image_tools.py
 add more fancy pattern | x |
 create contact sheet | x | 
 create a *how to generate little planet* | x |

@@ -345,7 +345,6 @@ def create_circle_pattern2(pattern_size, color_circles, number_circle = 8):
     cv2.imwrite(dir_tmp+"pattern_circle.jpg",circle_img)
     return circle_img
 
-
 def create_stripes_pattern(pattern_size, color1, color2, number_stripes = 8, alpha = 0):
     """The function creates a bi-color circle parttern from the image center.
     """
@@ -424,7 +423,6 @@ def create_stripes_pattern2(pattern_size, color_stripes, number_stripes = 8, alp
     cv2.imwrite(dir_tmp+"pattern_stripes.jpg", stripes_img)
     return stripes_img
 
-
 def create_stripes_pattern_orthogonal(pattern_size, color1, color2, number_stripes = 8, alpha = 0):
     """The function creates a bi-color circle parttern from the image center.
     """
@@ -463,8 +461,6 @@ def create_stripes_pattern_orthogonal(pattern_size, color1, color2, number_strip
     stripes_img = cv2.cvtColor(stripes_img, cv2.COLOR_BGR2RGB)
     cv2.imwrite(dir_tmp+"pattern_stripes.jpg", stripes_img)
     return stripes_img
-
-
 
 def create_stripes_pattern_3_colors(pattern_size, color1, color2, color3, number_stripes = 8, alpha = 0):
     """The function creates a tri-color circle parttern from the image center.
