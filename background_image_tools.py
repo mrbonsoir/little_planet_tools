@@ -49,7 +49,7 @@ def create_circle_pattern(pattern_size, color_circles,
     number_color = len(color_circles)
 
     # start to fill the image with colored circles.
-    # first the large one, then overdraw on it several other of smaller sizes.
+    # first the large one, then over on it several other of smaller sizes.
     s = 0
     for r_step in radius_vec:
         #print r_step,
@@ -85,7 +85,7 @@ def create_stripes_pattern(pattern_size, color_stripes, number_stripes = 8, angl
     width, height = pattern_size[0], pattern_size[1]
     stripe_img = np.zeros((height, width,3), np.uint8)
 
-    # parameter for the drawing function
+    # parameter for the ing function
     contourIdx = -1
 
     # compute positions of the stripes and displacement according to angle value
@@ -93,7 +93,7 @@ def create_stripes_pattern(pattern_size, color_stripes, number_stripes = 8, angl
     stripe_vec1 = np.arange(-width, width*2, stripe_step)
     alpha = np.tan(angle_stripe * np.pi / 180) * height
 
-    # start drawing the stripes on the black picture
+    # start ing the stripes on the black picture
     s = 0
     for s_step in stripe_vec1:
         color_stripe = color_stripes[s]
@@ -108,6 +108,50 @@ def create_stripes_pattern(pattern_size, color_stripes, number_stripes = 8, angl
             s = 0
     return stripe_img
 
+def create_circle_and_ray_of_light(pattern_size, color_stripes, angle_step = 60, angle_alpha = 0, circle_size = 0.1):
+    """
+    The function draws a pattern that looks like the sun in the center of the
+    frame with manga style ray of light going in every directions from the
+    center. Key word is obviously center.
+    In:
+        pattern_size (numpy array): two element vectors giving the image pattern
+                                    size
+        color_stripes (numpy array): size n x 3 for n different rgb color
+        number_circle (int): a number defining how many circles will be plotted
+                        on the image pattern
+    Out:
+        sunray_img (numpy array): image of size of the pattern_size but with 3
+        channels for R, G and B.
+    """
+
+    width, height = pattern_size[0], pattern_size[1]
+    center_ = (width / 2,height / 2)
+    r_max = np.sqrt((np.power(height,2)+np.power(width,2)))
+
+    # create black image
+    sunray_img = np.zeros((height, width,3), np.uint8)
+
+    vec_angle = np.hstack([np.arange(0 + angle_alpha, 360 + angle_alpha, angle_step), 360 + angle_alpha])
+
+    s = 0
+    for ii in np.arange(len(vec_angle)-1):
+        angle_val = vec_angle[ii]
+        angle_A = (vec_angle[ii] * np.pi ) / 180
+        angle_B = (vec_angle[ii+1] * np.pi ) / 180
+        L = [[width / 2, height / 2],
+             [width / 2 + r_max * np.sin(angle_A), height / 2 + r_max * np.cos(angle_A)],
+             [width / 2 + r_max * np.sin(angle_B), height / 2 + r_max * np.cos(angle_B)]]
+        contours = np.array(L).reshape((-1,1,2)).astype(np.int32)
+        cv2.drawContours(sunray_img,[contours],0,color_stripes[s],-1)
+        s = s + 1
+        if s == len(color_stripes):
+            s = 0
+
+    # draw sun in the center
+    cv2.circle(sunray_img, center_, int(r_max * circle_size), color_stripes[0], thickness=-1)
+
+    return sunray_img
+
 def display_image(image_data, image_name_for_title):
     """Thte function display an image, panorama image of little planet.
     """
@@ -116,7 +160,6 @@ def display_image(image_data, image_name_for_title):
     plt.xticks([])
     plt.yticks([])
     plt.title(image_name_for_title)
-    plt.draw()
     plt.show()
 
 def apply_pattern_mask(image_data, pattern_image_data, equalize_parameter = False,
