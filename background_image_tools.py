@@ -7,6 +7,7 @@ import numpy as np
 import os
 import shutil
 import matplotlib.pyplot as plt
+import halftoning_tools as ht
 
 def create_circle_pattern(pattern_size, color_circles,
                           source_circle = "center",
@@ -127,12 +128,14 @@ def create_circle_and_ray_of_light(pattern_size, color_stripes, angle_step = 60,
     width, height = pattern_size[0], pattern_size[1]
     center_ = (width / 2,height / 2)
     r_max = np.sqrt((np.power(height,2)+np.power(width,2)))
+    color_sunry = color_stripes[1:]
+    color_sun = color_stripes[0]
 
     # create black image
     sunray_img = np.zeros((height, width,3), np.uint8)
 
     vec_angle = np.hstack([np.arange(0 + angle_alpha, 360 + angle_alpha, angle_step), 360 + angle_alpha])
-
+    print vec_angle
     s = 0
     for ii in np.arange(len(vec_angle)-1):
         angle_val = vec_angle[ii]
@@ -142,13 +145,13 @@ def create_circle_and_ray_of_light(pattern_size, color_stripes, angle_step = 60,
              [width / 2 + r_max * np.sin(angle_A), height / 2 + r_max * np.cos(angle_A)],
              [width / 2 + r_max * np.sin(angle_B), height / 2 + r_max * np.cos(angle_B)]]
         contours = np.array(L).reshape((-1,1,2)).astype(np.int32)
-        cv2.drawContours(sunray_img,[contours],0,color_stripes[s],-1)
+        cv2.drawContours(sunray_img,[contours],0,color_sunry[s],-1)
         s = s + 1
-        if s == len(color_stripes):
+        if s == len(color_sunry):
             s = 0
 
     # draw sun in the center
-    cv2.circle(sunray_img, center_, int(r_max * circle_size), color_stripes[0], thickness=-1)
+    cv2.circle(sunray_img, center_, int(r_max * circle_size), color_sun, thickness=-1)
 
     return sunray_img
 
@@ -186,6 +189,7 @@ def apply_pattern_mask(image_data, pattern_image_data, equalize_parameter = Fals
     if binary_inv == False:
         ret, th1 = cv2.threshold(imG,threshold_parameter,255,cv2.THRESH_BINARY)
     else:
+        #th1 = ht.fun_halftone_image_with_mask(imG, mask_size=16, mask_type="linear")
         ret, th1 = cv2.threshold(imG,threshold_parameter,255,cv2.THRESH_BINARY_INV)
 
     # back to BGR for opencv

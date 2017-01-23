@@ -99,8 +99,8 @@ class LittlePlanet:
                             little_planet_name = self.output_file_name)
 
     def do_color_work(self, little_planet_name):
-        """The function applies some color transformation on the resulting little planet
-        image that has been created."""
+        """The function applies some color transformations on the resulting
+        little planet image that has been created."""
 
         # convert to BW to bin
         im_little_planet = cv2.imread(little_planet_name)
@@ -112,6 +112,11 @@ class LittlePlanet:
         ret,th1 = cv2.threshold(im_little_planet_BW_bin,127,255,cv2.THRESH_BINARY)
         cv2.imwrite(little_planet_name[0:-4]+"_BW_bin.jpg",th1)
 
+        # do some morphological operation on the binaray image
+        kernel = np.ones((5,5),np.uint8)
+        opening_bin = cv2.morphologyEx(th1, cv2.MORPH_OPEN, kernel)
+        cv2.imwrite(little_planet_name[0:-4]+"_BW_bin_opening.jpg",opening_bin)
+
         # convert BW to BW equalize to bin
         im_little_planet_BW_equalize = cv2.equalizeHist(im_little_planet_BW)
         cv2.imwrite(little_planet_name[0:-4]+"_BW_equalize.jpg",im_little_planet_BW_equalize)
@@ -121,18 +126,48 @@ class LittlePlanet:
         ret,th11 = cv2.threshold(im_little_planet_BW_equalize_bin,127,255,cv2.THRESH_BINARY)
         cv2.imwrite(little_planet_name[0:-4]+"_BW_equalize_bin.jpg",th11)
 
-
         # do some morphological operation on the binaray image
-        kernel = np.ones((5,5),np.uint8)
-        opening_bin = cv2.morphologyEx(th1, cv2.MORPH_OPEN, kernel)
-        cv2.imwrite(little_planet_name[0:-4]+"_BW_bin_opening.jpg",opening_bin)
-
         opening_equalize_bin = cv2.morphologyEx(th11, cv2.MORPH_OPEN, kernel)
         cv2.imwrite(little_planet_name[0:-4]+"_BW_equalize_bin_opening.jpg",opening_equalize_bin)
 
+        # do a pixelized version of the little planet
+        # resize to 16 x 32
+
+        im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 2, pixel_height = 1)
+        cv2.imwrite(little_planet_name[0:-4]+"_pixel0.jpg",im_LP_pixel)
+
+        im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 4, pixel_height = 2)
+        cv2.imwrite(little_planet_name[0:-4]+"_pixel1.jpg",im_LP_pixel)
+
+        im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 8, pixel_height = 4)
+        cv2.imwrite(little_planet_name[0:-4]+"_pixel2.jpg",im_LP_pixel)
+
+        im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 32, pixel_height = 16)
+        cv2.imwrite(little_planet_name[0:-4]+"_pixel3.jpg",im_LP_pixel)
+
+        im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 64, pixel_height = 32)
+        cv2.imwrite(little_planet_name[0:-4]+"_pixel4.jpg",im_LP_pixel)
+
+        im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 128, pixel_height = 64)
+        cv2.imwrite(little_planet_name[0:-4]+"_pixel5.jpg",im_LP_pixel)
+
+        im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 256, pixel_height = 128)
+        cv2.imwrite(little_planet_name[0:-4]+"_pixel6.jpg",im_LP_pixel)
+
+        im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 512, pixel_height = 256)
+        cv2.imwrite(little_planet_name[0:-4]+"_pixel7.jpg",im_LP_pixel)
+
+        im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 1024, pixel_height = 512)
+        cv2.imwrite(little_planet_name[0:-4]+"_pixel7.jpg",im_LP_pixel)
+
+        im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 2048, pixel_height = 1024)
+        cv2.imwrite(little_planet_name[0:-4]+"_pixel8.jpg",im_LP_pixel)
+
+
+        # NOT VERY NECESSARY TO HAVE THE ROTATION IMAGE
         # rotation of n degrees the color and BW images
-        im_little_planet_rotation = rotate_image(im_little_planet)
-        cv2.imwrite(little_planet_name[0:-4]+"_rotation.jpg",im_little_planet_rotation)
+        #im_little_planet_rotation = rotate_image(im_little_planet)
+        #cv2.imwrite(little_planet_name[0:-4]+"_rotation.jpg",im_little_planet_rotation)
 
     def do_pattern_color_work(self, little_planet_name,
                                 color_circles,
@@ -531,6 +566,22 @@ def apply_pattern_mask(little_planet_filename, pattern_filename):
 
     return masked_data
 
+def pixelize_image(image_rgb, pixel_width = 4, pixel_height = 2):
+    """The function create four versions of a pixelized image of the little
+    planet image and save them of course.
+    """
+    image_shape = np.shape(image_rgb)
+    im_little_planet_small =  cv2.resize(image_rgb,
+                              (pixel_width, pixel_height),
+                              interpolation = cv2.INTER_CUBIC)
+
+    # resize to original size
+    im_LP_pixel = cv2.resize(im_little_planet_small,
+                             (image_shape[1], image_shape[0]),
+                             interpolation = cv2.INTER_NEAREST)
+
+    return im_LP_pixel
+
 def rotate_image(image_rgb, angle_rotation = 2):
     """The function rotate an image of angle_rotation degrees."""
     image_shape = np.shape(image_rgb)
@@ -556,13 +607,16 @@ def display_color_work(width_contact_sheet = 400, height_contact_sheet = 200):
 
     command_montage = "montage -label '%f' "+dir_tmp+"pano_equi_thumb.jpg \
     "+dir_tmp+"little_planet_thumb.jpg \
-    "+dir_tmp+"little_planet_thumb_rotation.jpg \
+    "+dir_tmp+"little_planet_thumb_pixel1.jpg \
     "+dir_tmp+"little_planet_thumb_BW.jpg \
-    "+dir_tmp+"little_planet_thumb_BW_bin.jpg \
-    "+dir_tmp+"little_planet_thumb_BW_bin_opening.jpg \
     "+dir_tmp+"little_planet_thumb_BW_equalize.jpg \
+    "+dir_tmp+"little_planet_thumb_pixel2.jpg \
+    "+dir_tmp+"little_planet_thumb_BW_bin.jpg \
     "+dir_tmp+"little_planet_thumb_BW_equalize_bin.jpg \
+    "+dir_tmp+"little_planet_thumb_pixel3.jpg \
+    "+dir_tmp+"little_planet_thumb_BW_bin_opening.jpg \
     "+dir_tmp+"little_planet_thumb_BW_equalize_bin_opening.jpg \
+    "+dir_tmp+"little_planet_thumb_pixel4.jpg \
     -tile 3x \
     -background white -geometry "+str(width_contact_sheet)+"x"+str(height_contact_sheet)+"+5+10 "+dir_tmp+"little_planet_montage.jpg"
     os.system(command_montage)
@@ -573,6 +627,20 @@ def display_color_work(width_contact_sheet = 400, height_contact_sheet = 200):
     plt.xticks([])
     plt.yticks([])
     plt.show()
+
+    command_montage = "montage "+dir_tmp+"little_planet_thumb_pixel[0-8].jpg \
+    -tile 3x3 -background white \
+    -geometry 2000x1000+10+10 "+dir_tmp+"little_planet_pixel_montage.jpg"
+
+    os.system(command_montage)
+    #print command_montage
+    im_lpt_montage = cv2.imread("/Users/jeremie/Pictures/tmp/little_planet_pixel_montage.jpg")
+    plt.figure(figsize=(15, 15))
+    plt.imshow(cv2.cvtColor(im_lpt_montage, cv2.COLOR_BGR2RGB))
+    plt.xticks([])
+    plt.yticks([])
+    plt.show()
+
 
 def display_color_work_with_pattern(little_planet_filename, width_contact_sheet = 500, height_contact_sheet = 250,
                                     file_name_reference = "thumb"):
