@@ -11,13 +11,22 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-def fun_halftone_image_with_mask(image_continuous_tone, mask_size = 4, mask_type = "random"):
+def fun_halftone_image_with_mask(image_continuous_tone, mask_size = 4,
+                                    mask_type = "random",
+                                    cell_factor = 1):
     """The function takes an image as input, single channel ideally.
-    The mask_size defines the size of the dot.
-    It returns an image in its halftone version.
+    In:
+        - mask_size (int): defines the size of the dot mask_size x mask_size
+        - mask_type (str): "random", "linear", "spiral" defines how the cell is
+        filled
+        - cell_factor (int): defines how big should be the cell
+    Out:
+        It returns an image in its halftone version.
+
     """
     size_image = np.shape(image_continuous_tone)
 
+    # create the mask
     if len(size_image) > 2:
         print "The image image given is multi-channel and we don't do that here."
         image_half_tone = image_continuous_tone
@@ -35,6 +44,7 @@ def fun_halftone_image_with_mask(image_continuous_tone, mask_size = 4, mask_type
                                     dtype = np.uint8)
             mask_single = np.argsort(mask)
             mask = mask_single.reshape((mask_size, mask_size))
+            print mask
 
         elif mask_type == "linear":
             mask = np.arange(max_level).reshape(mask_size,mask_size)
@@ -53,6 +63,11 @@ def fun_halftone_image_with_mask(image_continuous_tone, mask_size = 4, mask_type
         image_continuous_tone = (image_continuous_tone.astype(np.float32) / 256 ) \
                                     * max_level
 
+        # Apply the cell factor
+        mask = cv2.resize(mask,(mask_size * cell_factor,
+                                mask_size * cell_factor),
+                               interpolation = cv2.INTER_NEAREST)
+
         # create a mask of the image size by replicating the original cell
         factor_width  = int(np.ceil(np.shape(image_continuous_tone)[0] / mask_size)+1)
         factor_height = int(np.ceil(np.shape(image_continuous_tone)[1] / mask_size)+1)
@@ -64,7 +79,7 @@ def fun_halftone_image_with_mask(image_continuous_tone, mask_size = 4, mask_type
                                 0:np.shape(image_continuous_tone)[1]]
 
         # apply mask to coninuous image
-        image_half_tone = image_continuous_tone.astype(np.uint8) > mask_image
+        image_half_tone = image_continuous_tone.astype(np.uint8) >= mask_image
         image_half_tone = 255 * image_half_tone.astype(np.uint8)
 
         return image_half_tone
