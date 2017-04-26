@@ -146,17 +146,15 @@ class LittlePlanet:
         im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 32, pixel_height = 16)
         cv2.imwrite(little_planet_name[0:-4]+"_pixel3.jpg",im_LP_pixel)
 
-
         im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 64, pixel_height = 32)
         cv2.imwrite(little_planet_name[0:-4]+"_pixel4.jpg",im_LP_pixel)
-        """
 
         im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 128, pixel_height = 64)
         cv2.imwrite(little_planet_name[0:-4]+"_pixel5.jpg",im_LP_pixel)
 
         im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 256, pixel_height = 128)
         cv2.imwrite(little_planet_name[0:-4]+"_pixel6.jpg",im_LP_pixel)
-
+        """
         im_LP_pixel = pixelize_image(im_little_planet, pixel_width = 512, pixel_height = 256)
         cv2.imwrite(little_planet_name[0:-4]+"_pixel7.jpg",im_LP_pixel)
 
