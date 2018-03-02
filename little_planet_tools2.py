@@ -4,7 +4,10 @@ import os
 import shutil
 import matplotlib.pyplot as plt
 import skimage
+from skimage import transform
 from skimage import exposure
+import skimage.io as io
+
 
 dir_tmp = "/Users/jeremie/Pictures/tmp/"
 
@@ -34,7 +37,7 @@ class LittlePlanet:
 
         self.pano_equirectangular_name = file_name
         self.file_name_suffix = file_name_suffix
-        print "Panorama equirectangular name: %s" % self.pano_equirectangular_name
+        print("Panorama equirectangular name: %s" % self.pano_equirectangular_name)
 
         # load the image
         self.im_pano_equirectangular = cv2.imread(path_and_name_equirectangular)
@@ -46,12 +49,12 @@ class LittlePlanet:
         if ratio_width_height == 2:
             self.pano_width = img_size[1]
             self.pano_height = img_size[0]
-            print "Panorama equirectangular width: %1.0f " %  self.pano_width
-            print "Panorama equirectangular height: %1.0f " % self.pano_height
-            print "Suffix panorama name: %s " % self.file_name_suffix
+            print("Panorama equirectangular width: %1.0f " %  self.pano_width)
+            print("Panorama equirectangular height: %1.0f " % self.pano_height)
+            print("Suffix panorama name: %s " % self.file_name_suffix)
 
         else:
-            print "You should do something with your life."
+            print("You should do something with your life.")
 
         # resize image to get a faster manageable version
         self.pano_output_width = pano_output_width
@@ -75,14 +78,14 @@ class LittlePlanet:
         self.output_file_name = "little_planet_"+self.file_name_suffix+".jpg"
 
         # print some info about the little planet
-        print "Little image in progress with following parameters:"
-        print "output_width: %1.0f" % self.pano_output_width
-        print "output_height %1.0f" % self.pano_output_height
-        print "output_distance: %1.0f" % self.distance
-        print "r_angle: %1.0f" % self.r_angle
-        print "p_angle: %1.0f" % self.p_angle
-        print "y_angle: %1.0f" % self.y_angle
-        print "output name: %s" % self.output_file_name
+        print("Little image in progress with following parameters:")
+        print("output_width: %1.0f" % self.pano_output_width)
+        print("output_height %1.0f" % self.pano_output_height)
+        print("output_distance: %1.0f" % self.distance)
+        print("r_angle: %1.0f" % self.r_angle)
+        print("p_angle: %1.0f" % self.p_angle)
+        print("y_angle: %1.0f" % self.y_angle)
+        print("output name: %s" % self.output_file_name)
 
         # with _init__ a config file should be automatically created
         create_pto_config_file(path_and_name_equirectangular,
@@ -242,6 +245,77 @@ def create_pto_config_file(path_and_name_equirectangular, output_file_name = "te
 
     f.close()
 
+def create_pto_config_file_from_array(im_pano_equirectangular, output_file_name = "template33",
+                           output_width = 3000, output_height = 1500,
+                           r_angle = 0, p_angle = 90, y_angle = 0,
+                           output_distance = 300):
+    """This function create a pto file for hugin that can be used with nona. It
+    takes as input a numpy array assuming a good ratio for the given equirectangular
+    panorama image.
+
+    It uses a template in which we can change several parameters.
+    What doesn't change is that we start from an equirectangular panorama that we remap to
+    a spherical stereographic or something like that. Point is we are in the middle of a sphere
+    and we want to apply some distorsion to make it appear like a litte planet.
+
+    input:
+        pano_equirectangular_name (char) : name of the panorama image you want to create little planet from.
+        output_fileName (char) : "template33" | name of the pto filem can be changed
+        image_width   (float) : 3000  | size for the input image (not sure it is necessary)
+        image_height  (float) : 1500  |
+        output_width  (float) : 3000  | size for the output little planet image
+        output_height (float) : 1500  |
+        r_angle (float) : 0           | angle values to make the initial spherical panorama to rotate before projection on plan
+        p_angle (float) : 90          |
+        y_angle (float) : 0           |
+        output_distance (float) : 300 | tell how small(360)/big(0) will appear the little planet
+
+    About r_angle, p_angle and y_angle, they are key parameters to control the rotationo of the little planet:
+        - r_angle =   0, p_angle =  90, y_angle =   0 (default)
+        - r_angle =   0, p_angle = -90, y_angle =   0 for an inverse little planet.
+        - r_angle = -90, p_angle =   X, y_angle = -90 for a rotation clocklwise of X degrees.
+        - r_angle =  90, p_angle =   X, y_angle = -90 for a rotation clockwise of an inverse little planet.
+    """
+
+    # get the size parameters from the pano equirectangular
+    #im_pano_equirectangular = cv2.imread(path_and_name_equirectangular)
+
+    # resize image before saving to maybe save some processing time:
+
+    im_pano_equirectangular = transform.resize(im_pano_equirectangular,
+                                    (500, 1000))
+    path_and_name_equirectangular = '/Users/jeremie/Pictures/tmp/image_pano_equirectangular.png';
+    io.imsave(path_and_name_equirectangular,im_pano_equirectangular)
+
+    img_size = np.shape(im_pano_equirectangular)
+    #print img_size, np.shape(img_size)
+    image_width  = img_size[1]
+    image_height = img_size[0]
+
+    #hugin_ptoversion 2
+    f = open(output_file_name+'.pto', 'w')
+    f.write('# hugin project file\n')
+    f.write('p f4 w'+str(output_width)+' h'+str(output_height)+' v'+str(output_distance)+' E0 R0 n"TIFF_m c:LZW r:CROP"\n')
+    f.write('m g1 i0 f0 m2 p0.00784314\n')
+
+    # image lines
+    #-hugin  cropFactor=1
+    f.write('i w'+str(image_width)+' h'+str(image_height)+' f4 v360 Ra0 Rb0 Rc0 Rd0 Re0 Eev0 Er1 Eb1 r'+str(r_angle)+' p'+str(p_angle)+' y'+str(y_angle)+' TrX0 TrY0 TrZ0 Tpy0 Tpp0 j0 a0 b0 c0 d0 e0 g0 t0 Va1 Vb0 Vc0 Vd0 Vx0 Vy0  Vm5 n"'+path_and_name_equirectangular+'"\n')
+
+    # specify variables that should be optimized
+    f.write('v Ra0\n')
+    f.write('v Rb0\n')
+    f.write('v Rc0\n')
+    f.write('v Rd0\n')
+    f.write('v Re0\n')
+    f.write('v Vb0\n')
+    f.write('v Vc0\n')
+    f.write('v Vd0\n')
+    f.write('v\n')
+
+    f.close()
+
+
 def create_little_planet(path_and_name_equirectangular, config_file_pto = "template33.pto",
                          little_planet_name = "little_planet_thumb"):
     """The function will call the funcion create_pto_config_file to be able to
@@ -251,8 +325,8 @@ def create_little_planet(path_and_name_equirectangular, config_file_pto = "templ
     command_line_for_Hugin = "/Applications/Hugin/HuginTools/nona -o \
     /Users/jeremie/Pictures/tmp/imLittlePlanet33 -m TIFF %s %s " \
     % (config_file_pto,path_and_name_equirectangular)
-    print "Command line to call Hugin:"
-    print ">%s" % command_line_for_Hugin
+    #print "Command line to call Hugin:"
+    #print ">%s" % command_line_for_Hugin
     os.system(command_line_for_Hugin)
 
     # convert the TIFF file to jpg
@@ -281,10 +355,10 @@ def rotate_image(image_rgb, angle_rotation = 2):
     """The function rotate an image of angle_rotation degrees."""
     image_shape = np.shape(image_rgb)
     if len(image_shape) == 2:
-        print "we have a BW image."
+        print("we have a BW image.")
     else:
-        print "we have a color image."
-        #print image_shape
+        print("we have a color image.")
+        #print(image_shape)
         image_rgb_rotated = image_rgb
 
     center = (image_shape[1] / 2, image_shape[0] / 2)
@@ -351,9 +425,9 @@ def export_image(little_planet_filename, export_dir, file_name_mask_reference,
 
     # check export_dir
     if os.path.exists(export_dir):
-        print "The files you requested luckily exist, well done."
-        print "->%s" % export_dir
-        print "->%s" % file_name[5:-4]
+        print("The files you requested luckily exist, well done.")
+        print("->%s" % export_dir)
+        print("->%s" % file_name[5:-4])
 
         command_montage = "montage -label '%f' "+dir_tmp+"pano_equi_"+file_name_suffix+".jpg " \
         +dir_tmp+"little_planet_"+file_name_suffix+".jpg " \
@@ -398,4 +472,51 @@ def export_image(little_planet_filename, export_dir, file_name_mask_reference,
             shutil.copyfile(src, dst)
 
     else:
-        print "so close and so far in the same time."
+        print("so close and so far in the same time.")
+
+# display modfiy image
+def fun_display_pano_from_array(image_pano_equirectangular, p_angle_val=90, out_dist_val=300):
+    """The function takes as input an panorama equirectangular image, computes
+    transformation to get a little planet and display the resulting image.
+    """
+
+    # create pto
+    create_pto_config_file_from_array(image_pano_equirectangular,
+                            output_file_name = "template333",
+                            output_width = 1000,
+                            output_height = 500,
+                            r_angle = -90, p_angle = p_angle_val, y_angle = -90,
+                            output_distance = out_dist_val)
+
+    # apply config file
+    create_little_planet('/Users/jeremie/Pictures/tmp/image_pano_equirectangular.png', config_file_pto = "template333.pto",
+                            little_planet_name = "little_planet.jpg")
+
+    img_data = io.imread("/Users/jeremie/Pictures/tmp/little_planet.jpg")
+    plt.figure(figsize=(16,8))
+    plt.imshow(img_data)
+    plt.xticks([])
+    plt.yticks([])
+    plt.show()
+
+def fun_show_two_image_with_slider(image_A, image_B, slider_factor_=0.5):
+    """
+    The function displays two images side by side with a moving slider when used in interactive mode.
+    """
+    ss = np.shape(image_A)
+    if np.sum(np.shape(image_A)) - np.sum(np.shape(image_B)) != 0:
+        print('Dude, the images have a different sizes...')
+        return 0
+
+    if len(ss) == 2:
+        # we have a grayscale image
+        image_A = np.stack((image_A,image_A,image_A),axis=2)
+        image_B = np.stack((image_B,image_B,image_B),axis=2)
+
+    # display image
+    plt.figure(1)
+    plt.figure(figsize=(16,8))
+    plt.imshow(np.hstack([image_A[:,1:int(slider_factor_*ss[1]),:], image_B[:,int(slider_factor_*ss[1]):,:]]))
+    plt.xticks([])
+    plt.yticks([])
+    plt.show()

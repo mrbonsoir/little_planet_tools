@@ -28,7 +28,7 @@ def fun_halftone_image_with_mask(image_continuous_tone, mask_size = 4,
 
     # create the mask
     if len(size_image) > 2:
-        print "The image image given is multi-channel and we don't do that here."
+        print("The image image given is multi-channel and we don't do that here.")
         image_half_tone = image_continuous_tone
     else:
         # create mask
@@ -36,7 +36,7 @@ def fun_halftone_image_with_mask(image_continuous_tone, mask_size = 4,
             mask_size = 16
 
         max_level =  np.power(mask_size,2)
-        print max_level
+        #print max_level
 
         if mask_type == "random":
             mask = np.random.randint(0, high = max_level, # it can be any limit actually
@@ -44,7 +44,7 @@ def fun_halftone_image_with_mask(image_continuous_tone, mask_size = 4,
                                     dtype = np.uint8)
             mask_single = np.argsort(mask)
             mask = mask_single.reshape((mask_size, mask_size))
-            print mask
+            #print mask
 
         elif mask_type == "linear":
             mask = np.arange(max_level).reshape(mask_size,mask_size)
@@ -55,9 +55,9 @@ def fun_halftone_image_with_mask(image_continuous_tone, mask_size = 4,
             mask = np.abs(mask - max_level + 1)
 
         else:
-            print "We have a problem Houston."
+            print("We have a problem Houston.")
 
-        print "You choose a mask type [%s] of size [%1.0fx%1.0f]." % (mask_type, mask_size, mask_size)
+        print("You choose a mask type [%s] of size [%1.0fx%1.0f]." % (mask_type, mask_size, mask_size))
         # image quantification to have value between 0 and the maximum the
         # mask can produce
         image_continuous_tone = (image_continuous_tone.astype(np.float32) / 256 ) \
@@ -92,7 +92,7 @@ def fun_halftone_image_with_global_mask(image_continuous_tone):
     size_image = np.shape(image_continuous_tone)
 
     if len(size_image) > 2:
-        print "The image image given is multi-channel and we don't do that here."
+        print("The image image given is multi-channel and we don't do that here.")
         image_half_tone = image_continuous_tone
     else:
         # create mask
@@ -147,5 +147,5 @@ def printspiral(myarray):
     n = range(len(myarray))
     for y in n:
         for x in n:
-            print "%2i" % myarray[x][y],
+            print("%2i" % myarray[x][y])
         print
