@@ -1,40 +1,37 @@
-# ReadMe one more time
+# ReadMe
 
-Operation update.
+**28 June 2024**
 
-A beautiful piece of code, of course everything is relative.
+Since I started this repo *little planet tools* to create and manipulate little planet images, I changed computer, Python has grew up, newest modules are now available, so it's time for an update.
 
-# Content
-###  What do you need to use this code?
-### The famous content
+# What do we here?
+
+We do the same as before, we use [hugin][hugin-link] and its sciptability in order to not use its graphical user interface.
+
+The developped tool here is simply generating a config file *.pto* that can be called by the program *nona* in command line to perform image transformation from an equirectangular image representation of a 360º image panorama to an stereographic image that - with the right parameters - can produce a little planet.
+
+The code can be used as an external python module, and I'm sharing an example of usage with Python notebook.
+
+Also noticed that the code has been developped for use on a Macbook Pro M2 computer. Therefore for the code is pointing toward where hugin is installed on your machine.
 
 # What do you need to use this code?
 
-To run this code you will need to have:
-+ some Python 2.7.12 for now
-+ some modules such as the one here *little_planet_tools*
-+ [hugin][link-hugin] installed somewhere to be able to call is by script
-+ [imagemagick][link-imagemagick]  is a plus as I'm using a a lot to generate contact sheet
-+ [opencv][link-opencv] can be a good idea to have it installed somewhere
-+ and some other stuffs I will add later
+## Installation of Hugin on Macbook Pro M2
 
-# The famous content
+Visit this link https://groups.google.com/g/hugin-ptx/c/UbBpARzR3b8 and select *build with official 2023 code here(without gpu fix): https://bitbucket.org/Dannephoto/hugin/downloads/Hugin-2023.0.0.dmg*
 
-Over the past months I developed my own tools to work on  **little planets** images.
+The first install I have done was semi successfull as the program was crashing after each attempt of launching hugin.
 
-The code is available is split into modules that answer questions I was asking to myself: *how can I simply generate little planets from an equi-rectangular panoramic picture*?
+## Python and virtual environment
 
-The operation can be listed as follows:
+Info about virtualenv [here][link-virtual]
 
-1. create a **pto** configuration file with **distance**, **angle** and **image output size**
-2. apply the configuration file
-3. look at the resulting **little planet**
-4. restart operation 1 to 3 until satisfied with how look the **little planet**
-5. export **little planet** with latest **angle** and **distance** parameters values and a larger **image output size** for ideally printing it later.
+## Imagemagick
 
+It is not necessary but I'm using this list of image tools manipulation in command line a lot.
 
-
+More info [here][link-imagemagick].
 
 [link-hugin]: http://hugin.sourceforge.net/
 [link-imagemagick]: http://www.imagemagick.org/
-[link-opencv]: http://opencv.org/
+[link-virtual]:https://virtualenv.pypa.io/en/latest/installation.html
