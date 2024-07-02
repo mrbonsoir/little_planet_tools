@@ -1,5 +1,12 @@
 # ReadMe
 
+**2nd July 2024**
+
+I have added the following:
++ new module to create config *.pto* file
++ test image
++ python notebook with exemple of usage of the module
+
 **28 June 2024**
 
 Since I started this repo *little planet tools* to create and manipulate little planet images, I changed computer, Python has grew up, newest modules are now available, so it's time for an update.

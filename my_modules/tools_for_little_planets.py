@@ -1,6 +1,7 @@
 # 
 
 import numpy as np
+import imageio as io
 
 
 # add functions belwo
@@ -38,7 +39,7 @@ def create_pto_config_file(path_and_name_equirectangular_image, output_file_name
     """
 
     # get the size parameters from the pano equirectangular
-    im_pano_equirectangular = colour.read_image(path_and_name_equirectangular_image)
+    im_pano_equirectangular = io.v2.imread(path_and_name_equirectangular_image)
     img_size = np.shape(im_pano_equirectangular)
     image_width  = img_size[1]
     image_height = img_size[0]
@@ -51,7 +52,7 @@ def create_pto_config_file(path_and_name_equirectangular_image, output_file_name
 
     # image lines
     #-hugin  cropFactor=1
-    f.write('i w'+str(image_width)+' h'+str(image_height)+' f4 v360 Ra0 Rb0 Rc0 Rd0 Re0 Eev0 Er1 Eb1 r'+str(r_angle)+' p'+str(p_angle)+' y'+str(y_angle)+' TrX0 TrY0 TrZ0 Tpy0 Tpp0 j0 a0 b0 c0 d0 e0 g0 t0 Va1 Vb0 Vc0 Vd0 Vx0 Vy0  Vm5 n"'+path_and_name_equirectangular+'"\n')
+    f.write('i w'+str(image_width)+' h'+str(image_height)+' f4 v360 Ra0 Rb0 Rc0 Rd0 Re0 Eev0 Er1 Eb1 r'+str(r_angle)+' p'+str(p_angle)+' y'+str(y_angle)+' TrX0 TrY0 TrZ0 Tpy0 Tpp0 j0 a0 b0 c0 d0 e0 g0 t0 Va1 Vb0 Vc0 Vd0 Vx0 Vy0  Vm5 n"'+path_and_name_equirectangular_image+'"\n')
 
     # specify variables that should be optimized
     f.write('v Ra0\n')
