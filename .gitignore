@@ -1,6 +1,7 @@
 # folders #
 ##########
 /venvlp
+/notebook/.ipynb_checkpoints/
 
 # compiled source #
 ###################
@@ -14,7 +15,6 @@
 # python stuffs#
 ###############
 *.pyc
-*.ipynb
 __init__*
 to_do.txt
 
@@ -26,6 +26,9 @@ to_do.txt
 #####################
 test_image.jpg
 pattern_stripes.jpg
+notebook/out.jpg
+notebook/outImgStereoGraphic.jpg
+.gitignore.swp
 
 # Packages #
 ############
